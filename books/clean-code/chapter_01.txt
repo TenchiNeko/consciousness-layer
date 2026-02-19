@@ -1,0 +1,9 @@
+Clean Code: Functions
+
+Functions should do one thing. They should do it well. They should do it only. The reason we write functions is to decompose a larger concept into a set of steps at the next level of abstraction.
+
+A function should not be large enough to hold nested structures. Therefore, the indent level of a function should not be greater than one or two. This makes the functions easier to read and understand.
+
+The ideal number of arguments for a function is zero. Next comes one, followed closely by two. Three arguments should be avoided where possible. More than three requires very special justification.
+
+Side effects are lies. Your function promises to do one thing, but it also does other hidden things. Sometimes it will make unexpected changes to the variables of its own class. Sometimes it will make them to the parameters passed into the function or to system globals. In either case they are devious and damaging mistruths.

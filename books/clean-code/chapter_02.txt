@@ -1,0 +1,9 @@
+Clean Code: Error Handling
+
+Error handling is important, but if it obscures logic, it is wrong. Use exceptions rather than return codes. When you use exceptions, the logic of the caller is not obscured by error handling.
+
+Write your try-catch-finally statement first. Try to write tests that force exceptions, and then add behavior to your handler to satisfy your tests. This will cause you to build the transaction scope of the try block first.
+
+Do not return null. When we return null, we are essentially creating work for ourselves and foisting problems upon our callers. All it takes is one missing null check to send an application spinning out of control.
+
+Do not pass null. Returning null from methods is bad, but passing null into methods is worse. Unless you are working with an API which expects you to pass null, you should avoid passing null in your code whenever possible.

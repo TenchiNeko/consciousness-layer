@@ -1,0 +1,122 @@
+#!/bin/bash
+# deploy-v31-full.sh — Consciousness v3.1: weights + books + preferences
+set -e
+
+echo "🧠📚 Consciousness v3.1 Full Deploy"
+echo "===================================="
+
+if [ ! -f "standalone_orchestrator.py" ]; then
+    echo "❌ Run from ~/standalone-orchestrator"
+    exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PVE_HOST="${PVE_HOST:-100.81.200.82}"
+PVE_USER="${PVE_USER:-brandon}"
+
+echo ""
+echo "📦 Installing modules..."
+MODULES="performance_scorer.py strategy_advisor.py aspiration_engine.py
+consciousness_integration.py somatic_markers.py inner_monologue.py
+self_assessment.py meta_journal.py split_consciousness.py
+behavioral_weights.py book_rewards.py reading_orchestrator.py
+activity_preferences.py"
+
+for f in $MODULES; do
+    if [ -f "$SCRIPT_DIR/$f" ]; then
+        cp "$SCRIPT_DIR/$f" .
+        echo "  ✅ $f"
+    else
+        echo "  ❌ $f not found!"; exit 1
+    fi
+done
+
+echo ""
+echo "📖 Installing books..."
+if [ -d "$SCRIPT_DIR/books" ]; then
+    cp -r "$SCRIPT_DIR/books" .
+    echo "  ✅ $(find books -name 'chapter_*.txt' 2>/dev/null | wc -l) chapters"
+else
+    mkdir -p books
+    echo "  ⚠️  No books — create books/<name>/chapter_01.txt"
+fi
+
+echo ""
+echo "📝 Applying patches..."
+if grep -q "_HAS_CONSCIOUSNESS" standalone_orchestrator.py 2>/dev/null; then
+    echo "  v1 ✅"
+else
+    cp "$SCRIPT_DIR/patch_orchestrator.py" . 2>/dev/null || true
+    python3 patch_orchestrator.py --apply
+fi
+
+if grep -q "v2.1:\|v3.0: Split-brain" standalone_orchestrator.py 2>/dev/null; then
+    echo "  v2 ✅"
+else
+    cp "$SCRIPT_DIR/patch_orchestrator_v2.py" . 2>/dev/null || true
+    python3 patch_orchestrator_v2.py --apply
+fi
+
+if grep -q "v3.0: Split-brain" standalone_orchestrator.py 2>/dev/null; then
+    echo "  v3 ✅"
+else
+    cp "$SCRIPT_DIR/patch_v3_split_brain.py" . 2>/dev/null || true
+    python3 patch_v3_split_brain.py --apply
+fi
+
+# Bug fix: model reference
+sed -i 's/self\.config\.llama_70b/self.config.get_agent("build").model/g' standalone_orchestrator.py
+# Bug fix: iteration attribute
+sed -i "s/getattr(task_state, 'current_iteration', 1)/getattr(task_state, 'iteration', 1)/g" standalone_orchestrator.py
+
+# Books patch
+if grep -q "get_reading_prompts" standalone_orchestrator.py 2>/dev/null; then
+    echo "  books ✅"
+else
+    cp "$SCRIPT_DIR/patch_v31_books.py" . 2>/dev/null || true
+    python3 patch_v31_books.py --apply
+fi
+
+echo ""
+echo "🔬 Validating..."
+python3 -c "import ast; ast.parse(open('standalone_orchestrator.py').read())" || { echo "❌ Syntax!"; exit 1; }
+python3 -c "
+from consciousness_integration import ConsciousnessLayer
+c = ConsciousnessLayer(db_path='/tmp/v31_val.db')
+for sub in ['weights', 'reading', 'preferences', 'split']:
+    assert getattr(c, sub) is not None, f'Missing: {sub}'
+print('  ✅ All 4 new subsystems loaded')
+" || { echo "❌ Validation failed!"; exit 1; }
+
+echo ""
+echo "📤 Syncing to PVE..."
+if ssh -o ConnectTimeout=5 "$PVE_USER@$PVE_HOST" "echo ok" >/dev/null 2>&1; then
+    ssh "$PVE_USER@$PVE_HOST" "mkdir -p /shared/consciousness"
+    rsync -az --timeout=30 \
+        performance_scorer.py strategy_advisor.py aspiration_engine.py \
+        consciousness_integration.py somatic_markers.py inner_monologue.py \
+        self_assessment.py meta_journal.py split_consciousness.py \
+        behavioral_weights.py book_rewards.py reading_orchestrator.py \
+        activity_preferences.py \
+        "$PVE_USER@$PVE_HOST:/shared/consciousness/"
+    echo "  ✅ Synced"
+else
+    echo "  ⚠️  PVE unreachable"
+fi
+
+echo ""
+echo "===================================="
+echo "✅ Consciousness v3.1 FULL deployed!"
+echo ""
+echo "  🧠 LEARNING: technical experience → behavioral weights"
+echo "  📚 READING: good work earns book chapters as reward"
+echo "  ❤️  FEELINGS: coding vs reading emotions tracked"
+echo "  🏆 PREFERENCES: system discovers what it enjoys"
+echo "  🔄 MOTIVATION: preferences drive work quality"
+echo ""
+echo "  Flow: code well → earn credits → read book →"
+echo "        cross-grade learnings → grow weights →"
+echo "        feel good about reading → work harder to earn more"
+echo ""
+echo "  Books: $(ls books/ 2>/dev/null | tr '\n' ', ')"
+echo "===================================="

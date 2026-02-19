@@ -1,0 +1,11 @@
+Clean Code: Meaningful Names
+
+Use intention-revealing names. The name of a variable, function, or class should answer all the big questions. It should tell you why it exists, what it does, and how it is used. If a name requires a comment, then the name does not reveal its intent.
+
+Avoid disinformation. Do not refer to a grouping of accounts as an accountList unless it is actually a List. The word list means something specific to programmers. If the container holding the accounts is not actually a List, it may lead to false conclusions.
+
+Make meaningful distinctions. If names must be different, then they should also mean something different. Number-series naming like a1, a2, a3 is the opposite of intentional naming. Such names are not disinformative — they are noninformative.
+
+Use pronounceable names. If you cannot pronounce it, you cannot discuss it without sounding like an idiot. This matters because programming is a social activity.
+
+Use searchable names. Single-letter names and numeric constants have a particular problem in that they are not easy to locate across a body of text. The length of a name should correspond to the size of its scope.

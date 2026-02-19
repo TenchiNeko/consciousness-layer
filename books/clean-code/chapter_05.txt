@@ -1,0 +1,9 @@
+Clean Code: Unit Tests
+
+Test code is just as important as production code. It is not a second-class citizen. It requires thought, design, and care. It must be kept as clean as production code.
+
+The tests must be easy to understand. Readability is perhaps even more important in unit tests than it is in production code. What makes tests readable is the same thing that makes all code readable: clarity, simplicity, and density of expression. In a test you want to say a lot with as few expressions as possible.
+
+One assert per test is a good guideline. The number of asserts in a test is not as important as the fact that the test tests one concept. You should minimize the number of asserts per concept and test just one concept per test function.
+
+Clean tests follow five other rules that form the FIRST acronym: Fast — tests should be fast. When tests run slow, you will not want to run them frequently. Independent — tests should not depend on each other. Repeatable — tests should be repeatable in any environment. Self-Validating — tests should have a boolean output: pass or fail. Timely — tests need to be written in a timely fashion, just before the production code that makes them pass.
